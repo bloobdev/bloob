@@ -587,6 +587,102 @@ summary(sc)
 View(sc)
 model <- aov(sales ~ city, data = sc)
 summary(model)
+  
+  #Multiple Linear Regression
+#Apply Linear Regression in between wind and area columns.
+#Predict value of area if value of wind = 9.5
+model = lm(wind~area, data = forestfires)
+summary(model)
+p = as.data.frame(9.5)
+colnames(p) = "area"
+predict(model, newdata = p)
+
+install.packages(c('tidyverse', 'MASS', 'caret', 'car'))
+library(tidyverse)
+library(caret)
+library(MASS)
+View(Boston)
+
+# build a multiple regression model
+model <- lm(medv ~ ., data = Boston)
+model
+
+# making predictions
+predictions <- model %>% predict(Boston)
+predictions
+
+# finding the model performance
+data.frame(
+  RMSE = RMSE(predictions, Boston$medv), R2 = R2(predictions, Boston$medv)
+)
+
+# Detecting multicollinearity
+library(car)
+vif(model)
+# VIF = 1 (no correlation)
+# VIF <=5 (moderately correlated)
+# VIF > 5 (highly correlated)
+
+# Testing Autocorrelation
+durbinWatsonTest(model)
+# DW = 2 (No Autocorrelation)
+# 0 <= DW < 2 (Positive Autocorrelation)
+# 2 < DW <= 4 (Negative Autocorrelation)
+
+# Importing the excel data
+#install.packages("readxl")
+library(readxl)
+kang_nose <- read_excel("D:/ISDC Work/R Codes/Reg/kang_nose.xlsx")
+
+# Plotting columns
+plot(kang_nose, xlab = 'nose_width', ylab = 'nose_length',
+     col = 'darkorchid1', pch = 19)
+
+# Building Linear Model
+lm_kang <- lm(nose_length ~ nose_width, data = kang_nose)
+
+# Printing result of Model
+lm_kang
+
+# Getting other outputs - coefficients, residuals
+lm_kang$coefficients
+lm_kang$residuals
+
+# Making a prediction
+# Creating a dataframe with the predictor value
+nose_width_new <- data.frame(nose_width = 250)
+# Run the predict function
+predict(lm_kang, nose_width_new)
+
+# Creating a plot with regression line
+plot(kang_nose$nose_width, kang_nose$nose_length,
+     xlab = 'nose_width', ylab = 'nose_length',
+     col = 'darkorchid1', pch = 19)
+abline(lm_kang$coefficients, col = 'red')
+
+# Prediction on all values of X-variable (nose_width)
+nose_length_est <- predict(lm_kang)
+
+# Finding the residuals (manually)
+# --> (actual - observed) for Y-values-estimated
+res <- kang_nose$nose_length - nose_length_est
+res
+
+# Finding r-square of the model
+ss_res <- sum(res ^ 2, na.rm = T)
+ss_tot <- sum((kang_nose$nose_length - mean(kang_nose$nose_length))^2)
+r_sq <- 1 - (ss_res / ss_tot)
+r_sq
+# R square of 0.7768914 is good --> MODEL IS GOOD
+
+# Root Mean Square Error
+rmse <- sqrt(sum(res ^ 2, na.rm = T) / length(res))
+rmse
+
+# Apply Durbin Watson Test for Autocorrelation
+#install.packages('car')
+library(car)
+durbinWatsonTest(lm_kang)
 }
 \description{
 Prints 'Hello, world!'.
